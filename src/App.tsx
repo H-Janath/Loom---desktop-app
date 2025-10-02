@@ -1,16 +1,20 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './App.css'
-import { Button } from './components/ui/button'
+import { Toaster } from 'sonner';
+import ControlLayout from './layout/ControlLayout';
+import AuthButton from './components/ui/global/AuthButton';
 
 function App() {
 
+  const client = new QueryClient();
+
   return (
-    <>
-      <div className="">
-        <Button>
-          CLick
-        </Button>
-      </div>
-    </>
+      <QueryClientProvider client={client}>
+        <ControlLayout>
+          <AuthButton/>
+        </ControlLayout>
+          <Toaster/>
+      </QueryClientProvider>
   )
 }
 
