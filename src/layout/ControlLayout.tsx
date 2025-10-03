@@ -16,7 +16,7 @@ const ControlLayout = ({ children, className }: Props) => {
   })
 
   return (
-    <div className={cn(className, isVivibale && "invisible","bg-[#171717] flex px-1 flex-col rounded-3xl overflow-hidden h-screen")}>
+    <div className={cn(className, isVivibale && "invisible","bg-[#171717] flex px-1 flex-col rounded-3xl overflow-hidden")}>
       <div className="flex justify-between items-center p-5 draggable">
         <span className="non-draggable">
           <UserButton/>
