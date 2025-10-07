@@ -118,11 +118,11 @@
     @apply bg-transparent text-foreground overflow-hidden;
   }
 }
-.draggable {
+.draggable{
   -webkit-app-region: drag;
 }
 
-.non-draggable {
+.non-draggable{
   -webkit-app-region: no-drag;
 }
 

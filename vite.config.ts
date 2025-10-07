@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import path from 'node:path'
+import path, { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react'
@@ -9,6 +9,18 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig({
+  build:{
+    emptyOutDir:false,
+    manifest:true,
+    outDir: "dist",
+    rollupOptions:{
+      input: {
+        main: resolve(__dirname,"index.html"),
+        studio: resolve(__dirname,"studio.html"),
+        web_camp_app : resolve(__dirname,"webcam.html")
+      }
+    }
+  },
   server:{
     proxy:{
       "/api":{target: 'http://localhost:3000/api',

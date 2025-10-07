@@ -3,7 +3,7 @@ import './App.css'
 function App() {
 
   return (
-     <h1>Studio componenet</h1>
+     <h1>web cam app componenet</h1>
   )
 }
 

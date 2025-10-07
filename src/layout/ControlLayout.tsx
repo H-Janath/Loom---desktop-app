@@ -9,14 +9,15 @@ type Props = {
 }
 const ControlLayout = ({ children, className }: Props) => {
 
-  const [isVivibale, setIsVisibale] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   window.ipcRenderer.on('hide-plugin', (event, payload) => {
-    setIsVisibale(payload.state)
+    console.log(event)
+    setIsVisible(payload.state)
   })
 
   return (
-    <div className={cn(className, isVivibale && "invisible","bg-[#171717] flex px-1 flex-col rounded-3xl overflow-hidden")}>
+    <div className={cn(className, isVisible && "invisible","bg-[#171717] flex px-1 flex-col rounded-3xl overflow-hidden")}>
       <div className="flex justify-between items-center p-5 draggable">
         <span className="non-draggable">
           <UserButton/>
@@ -31,7 +32,7 @@ const ControlLayout = ({ children, className }: Props) => {
         {children}
       </div>
       <div className="p-5 flex w-full">
-          <div className="flex-items-center gap-x-2">
+          <div className="flex items-center gap-x-2">
             <img src="/opal-logo.svg" alt="app logo"/>
             <p className="text-white text-2xl">Opal</p>
           </div>

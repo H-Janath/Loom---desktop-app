@@ -7,38 +7,37 @@ export function cn(...inputs: ClassValue[]) {
 const httpClient = axios.create({
   baseURL: import.meta.env.VITE_HOST_URL
 })
-export const onCloseApp = ()=> window.ipcRenderer.send('closeApp');
+export const onCloseApp = () => window.ipcRenderer.send('closeApp');
 
-export const fetchUserProfile = async(clerkId:string)=>{
-  const response = await httpClient.get(`/auth/${clerkId}`,{
-    headers:{
+export const fetchUserProfile = async (clerkId: string) => {
+  const response = await httpClient.get(`/auth/${clerkId}`, {
+    headers: {
       'Content-Type': 'application/json'
     }
   })
   return response.data;
 }
 
-export const getMediaSources = async ()=>{
+export const getMediaSources = async () => {
   const displays = await window.ipcRenderer.invoke('getSources')
-  const enumarateDevices =  await window.navigator.mediaDevices.enumerateDevices();
-  const audioInputs = enumarateDevices.filter((device)=>device.kind==='audioinput')
-  console.log("Getting sources");
-  return {displays,audioInputs}
+  const enumarateDevices = await window.navigator.mediaDevices.enumerateDevices();
+  const audioInputs = enumarateDevices.filter((device) => device.kind === 'audioinput')
+  return { displays, audioInputs }
 }
 
 export const updateStudioSettings = async (
-  id:string,
+  id: string,
   screen: string,
   audio: string,
-  presert : 'HD' | 'SD'
-)=>{
-  const response = await httpClient.post(`/studio/${id}`,{
-    screen,audio,presert
+  presert: 'HD' | 'SD'
+) => {
+  const response = await httpClient.post(`/studio/${id}`, {
+    screen, audio, presert
   },
-{
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-return response.data
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  return response.data
 }

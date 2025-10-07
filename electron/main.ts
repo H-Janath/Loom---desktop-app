@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, desktopCapturer, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
@@ -15,8 +15,8 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
-let studio : BrowserWindow | null
-let floatingWebCam : BrowserWindow | null
+let studio: BrowserWindow | null
+let floatingWebCam: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
@@ -24,11 +24,12 @@ function createWindow() {
     height: 600,
     minHeight: 600,
     minWidth: 300,
-    frame:false,
-    hasShadow:false,
+    frame: false,
+    hasShadow: false,
     transparent: true,
     alwaysOnTop: true,
-    focusable: false,
+    focusable: true,
+    titleBarStyle: 'hidden',
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       nodeIntegration: false,
@@ -39,17 +40,18 @@ function createWindow() {
   })
 
   studio = new BrowserWindow({
-    width:400,
+    width: 400,
     height: 50,
-    minHeight:70,
-    maxHeight: 400, 
+    minHeight: 600,
+    maxHeight: 400,
     minWidth: 300,
     maxWidth: 400,
-    frame:false,
+    frame: false,
     transparent: true,
     alwaysOnTop: true,
-    focusable: false,
-    icon: path.join(process.env.VITE_PUBLIC,'electron-vite.svg'),
+    focusable: true,
+    titleBarStyle: 'hidden',
+    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -58,18 +60,19 @@ function createWindow() {
     },
   })
 
-   floatingWebCam = new BrowserWindow({
-    width:400,
+  floatingWebCam = new BrowserWindow({
+    width: 400,
     height: 200,
-    minHeight:70,
-    maxHeight: 400, 
+    minHeight: 600,
+    maxHeight: 400,
     minWidth: 300,
     maxWidth: 400,
-    frame:false,
+    frame: false,
     transparent: true,
     alwaysOnTop: true,
-    focusable: false,
-    icon: path.join(process.env.VITE_PUBLIC,'electron-vite.svg'),
+    focusable: true,
+    titleBarStyle: 'hidden',
+    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -78,31 +81,76 @@ function createWindow() {
     },
   })
 
-  win.setVisibleOnAllWorkspaces(true, {visibleOnFullScreen: true})
-  win.setAlwaysOnTop(true, 'screen-saver',1)
-  studio.setVisibleOnAllWorkspaces(true, {visibleOnFullScreen: true})
-  studio.setAlwaysOnTop(true, 'screen-saver',1)
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  win.setAlwaysOnTop(true, 'screen-saver', 1)
+  studio.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  studio.setAlwaysOnTop(true, 'screen-saver', 1)
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
   })
 
-  studio.webContents.on('did-finish-load',()=>{
-    studio?.webContents.send(
-      'main-process-message',
-      new Date().toLocaleString()
-    )
+  studio.webContents.on('did-finish-load', () => {
+    studio?.webContents.send('main-process-message',(new Date).toLocaleString())
   })
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
+    studio.loadURL(`${import.meta.env.VITE_APP_URL}/studio.html`)
+    floatingWebCam.loadURL(`${import.meta.env.VITE_APP_URL}/webcam.html`)
   } else {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+    studio.loadFile(path.join(RENDERER_DIST,'studio.html'))
+    floatingWebCam.loadFile(path.join(RENDERER_DIST,"webcam.html"))
   }
 }
+ipcMain.on('closeApp', () => {
+  // Close the main window safely
+  if (win && !win.isDestroyed()) {
+    win.close();
+  }
 
+  // Optional: close other windows too
+  if (studio && !studio.isDestroyed()) {
+    studio.close();
+  }
+  if (floatingWebCam && !floatingWebCam.isDestroyed()) {
+    floatingWebCam.close();
+  }
+
+  // Quit the app if needed
+  app.quit();
+});
+
+ipcMain.handle('getSources',async()=>{
+  const data =  await desktopCapturer.getSources({
+    thumbnailSize:{height: 100,width: 150},
+    fetchWindowIcons:true,
+    types: ['window','screen']
+  })
+  return data;
+})
+
+ipcMain.on("media-sources",(event,payload)=>{
+  studio?.webContents.send("profile-recived",payload)
+})
+
+ipcMain.on("resize-studio",(event,payload)=>{
+  console.log(event)
+  if(payload.shrink){
+    studio?.setSize(400,100)
+  }
+  if(!payload.shrink){
+    studio?.setSize(400,250)
+  }
+})
+
+ipcMain.on("hide-plugins",(event,payload)=>{
+  console.log(event)
+  win?.webContents.send("hide-plugins",payload)
+})
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -112,6 +160,7 @@ app.on('window-all-closed', () => {
     win = null
   }
 })
+
 
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the

@@ -35,11 +35,12 @@ const Widget = () => {
 
     const {state, fetchMediaResources} = useMediaResources();
 
-    console.log(state)
+    console.log("janathp",profile)
 
     useEffect(()=>{
         if(user && user.id){
             fetchUserProfile(user.id).then ((p)=>setProfile(p))
+            fetchMediaResources()
         }
     },[user])
 
@@ -47,8 +48,8 @@ const Widget = () => {
     return (
         <div className="p-5">
             <ClerkLoading>
-                <div className="h-full flex jutify-center items-center">
-                    <Loader />
+                <div className="h-full flex justify-center items-center">
+                                    <Loader className="animate-spin" color="#fff" />
                 </div>
             </ClerkLoading>
             <SignedIn>
@@ -59,7 +60,7 @@ const Widget = () => {
                     />
                 ): (
                     <div className="w-full h-full flex justify-center items-center">
-                        <Loader color="#fff"/>
+                                    <Loader className="animate-spin" color="#fff" />
                     </div>
                 ) }
             </SignedIn>
