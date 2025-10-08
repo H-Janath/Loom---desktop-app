@@ -134,6 +134,7 @@ ipcMain.handle('getSources',async()=>{
 })
 
 ipcMain.on("media-sources",(event,payload)=>{
+  console.log("EVENT : media sources",payload)
   studio?.webContents.send("profile-recived",payload)
 })
 

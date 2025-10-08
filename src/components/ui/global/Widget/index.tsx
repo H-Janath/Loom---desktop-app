@@ -35,7 +35,6 @@ const Widget = () => {
 
     const {state, fetchMediaResources} = useMediaResources();
 
-    console.log("janathp",profile)
 
     useEffect(()=>{
         if(user && user.id){

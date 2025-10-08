@@ -111,6 +111,7 @@ ipcMain.handle("getSources", async () => {
   return data;
 });
 ipcMain.on("media-sources", (event, payload) => {
+  console.log("EVENT : media sources", payload);
   studio == null ? void 0 : studio.webContents.send("profile-recived", payload);
 });
 ipcMain.on("resize-studio", (event, payload) => {

@@ -13,7 +13,7 @@ export const useStudioSettings = (
     plan?: 'PRO' | 'FREE'
 ) => {
 
-    const { onPreset, setPreset } = useState<'HD' | 'SD' | undefined>()
+    const [onPreset, setPreset] = useState<'HD' | 'SD' | undefined>()
 
     const { register, watch } = useZodForm(updateStudioSettingSchema, {
         screen: screen!,
@@ -37,7 +37,7 @@ export const useStudioSettings = (
     })
 
     useEffect(() => {
-        if (screen && audio && preset) {
+        if (screen && audio) {
             window.ipcRenderer.send("media-sources", {
                 screen,
                 id: id,
@@ -46,7 +46,7 @@ export const useStudioSettings = (
                 plan
             })
         }
-    }, [])
+    }, [screen, audio])
 
     useEffect(() => {
         const subscribe = watch((values) => {

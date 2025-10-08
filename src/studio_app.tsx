@@ -1,9 +1,10 @@
 import './App.css'
+import StudioTray from './components/ui/global/StudioTray'
 
 function App() {
 
   return (
-     <h1>Studio componenet</h1>
+    <StudioTray/>
   )
 }
 
