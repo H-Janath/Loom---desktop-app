@@ -1,4 +1,4 @@
-import { onStopRecording, StartRecording } from "@/lib/recorder"
+import { onStopRecording, selectSources, StartRecording } from "@/lib/recorder"
 import { cn, videoRecordingTime } from "@/lib/utils"
 import { Cast, Pause, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react"
@@ -30,6 +30,26 @@ const StudioTray = () => {
   })
 
   useEffect(() => {
+    let previewStream: MediaStream | null = null;
+
+    const setupPreview = async () => {
+      if (preview && onSources?.screen && videoElement.current) {
+        const stream = await selectSources(onSources, videoElement);
+        previewStream = stream ?? null;
+      }
+    };
+
+    setupPreview();
+
+    return () => {
+      if (previewStream) {
+        previewStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [preview, onSources]);
+
+
+  useEffect(() => {
     if (!recording) return
     const recordTimeInterval = setInterval(() => {
       const time = count + (new Date().getTime() - initialTime.getTime());
@@ -53,11 +73,16 @@ const StudioTray = () => {
 
   return !onSources ? '' :
     <div className="flex flex-col justify-end gap-y-5 h-screen">
-      {preview && (<video
-        autoPlay
-        ref={videoElement}
-        className={cn('w-6/12 border-2 self-end bg-white')}
-      ></video>)}
+      {preview && (
+        <video
+          ref={videoElement}
+          className={cn('w-6/12 border-2 self-end bg-white rounded-lg shadow-lg')}
+          autoPlay
+          muted
+          playsInline
+        />
+      )}
+
       <div className="rounded-full flex justify-around items-center h-20 w-full border-2 bg-[#171717] draggable border-white/40">
         <div {...(onSources && {
           onClick: () => {
@@ -70,33 +95,33 @@ const StudioTray = () => {
             {onTimer}
           </span>}
         </div>
-        {!recording ?( 
-        <Pause
+        {!recording ? (
+          <Pause
             className="non-dragable opacity-50"
             size={32}
             fill="white"
             stroke="none"
-         />) :
+          />) :
           (
-              <Square
-               size={32}
-               className="non-draggable cursor-pointer hover:scale-110 transform transition duration-150"
-               fill="white"
-               onClick={()=>{
+            <Square
+              size={32}
+              className="non-draggable cursor-pointer hover:scale-110 transform transition duration-150"
+              fill="white"
+              onClick={() => {
                 setRecording(false)
                 clearTime()
                 onStopRecording()
-               }}
-               stroke="white"
-               />
+              }}
+              stroke="white"
+            />
           )}
-          <Cast
-            onClick={()=> setPreview((prev)=> !prev)}
-            size={32}
-            fill="white"
-            className="non-draggable cursor-pointer hover:opacity-60"
-            stroke="white"
-          />
+        <Cast
+          onClick={() => setPreview((prev) => !prev)}
+          size={32}
+          fill="white"
+          className="non-draggable cursor-pointer hover:opacity-60"
+          stroke="white"
+        />
       </div>
     </div>
 }
