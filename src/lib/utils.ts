@@ -58,3 +58,8 @@ export const videoRecordingTime = (ms: number) => {
     .padStart(2, '0')
   return {length: `${hours}:${minute}:${second}`,minute}
 }
+
+export const resizeWindow = (shrink :boolean)=>{
+  window.ipcRenderer.send('rezsize-studio',{shrink})
+
+}

@@ -1,9 +1,10 @@
 import './App.css'
+import WebCam from './components/ui/global/WebCam'
 
 function App() {
 
   return (
-     <h1>web cam app componenet</h1>
+     <WebCam/>
   )
 }
 

@@ -1,5 +1,5 @@
 import { onStopRecording, selectSources, StartRecording } from "@/lib/recorder"
-import { cn, videoRecordingTime } from "@/lib/utils"
+import { cn, resizeWindow, videoRecordingTime } from "@/lib/utils"
 import { Cast, Pause, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react"
 
@@ -28,6 +28,11 @@ const StudioTray = () => {
     console.log(event)
     setOnSources(payload)
   })
+
+  useEffect(()=>{
+    resizeWindow(preview);
+    return ()=> resizeWindow(preview)
+  },[preview])
 
   useEffect(() => {
     let previewStream: MediaStream | null = null;
